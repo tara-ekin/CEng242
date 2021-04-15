@@ -51,7 +51,14 @@ splitOn ch st = (splitOnHelperLeft ch st, splitOnHelperRight ch st)
 
 -- tokenizeS: Transform an SJSON string into a list of tokens.
 tokenizeS :: String -> [String]
-tokenizeS _ = undefined
+tokenizeS "" = []
+tokenizeS st
+    | (head st == '{') || (head st == '}') || (head st == ':') || (head st == ',') = 
+        [[head st]] ++ tokenizeS (tail st)
+    | (head st == '\'') =
+        [fst (splitOn '\'' (tail st))] ++ tokenizeS (snd (splitOn '\'' (tail st)))
+    | (head st == '\t') || (head st == '\n') || (head st == ' ') = 
+        tokenizeS (tail st)
 
 -- prettifyS: Prettify SJSON, better tokenize first!
 prettifyS :: String -> String
