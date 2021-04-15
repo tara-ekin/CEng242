@@ -33,8 +33,21 @@ integers = interleave naturals [-1, -2..]
 -- Part II: SJSON Prettification
 
 -- splitOn: Split string on first occurence of character.
+
+splitOnHelperRight :: Char -> String -> String
+splitOnHelperRight ch "" = ""
+splitOnHelperRight ch st = if ch /= head st 
+                              then splitOnHelperRight ch (tail st)
+                              else (tail st)
+
+splitOnHelperLeft :: Char -> String -> String
+splitOnHelperLeft ch "" = ""
+splitOnHelperLeft ch st = if ch /= head st
+                             then [head st] ++ splitOnHelperLeft ch (tail st)
+                             else ""
+                             
 splitOn :: Char -> String -> (String, String)
-splitOn _ _ = undefined
+splitOn ch st = (splitOnHelperLeft ch st, splitOnHelperRight ch st)
 
 -- tokenizeS: Transform an SJSON string into a list of tokens.
 tokenizeS :: String -> [String]
