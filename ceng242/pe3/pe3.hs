@@ -27,8 +27,18 @@ isInGrid grid coor = if (0 <= (fst coor)) && (fst coor <= (length grid)) && (0 <
 
 -------------------------------------------------------------------------------------------
 
+rockCount :: Cell -> Int
+rockCount (Rock a) = a
+rockCount _ = 0
+
+countRockHor :: [Cell] -> [Int]
+countRockHor inpLine = map (rockCount) (inpLine)
+
+countRockVer :: [[Cell]] -> [[Int]]
+countRockVer inpGrid = map countRockHor inpGrid
+
 totalCount :: Grid -> Int
-totalCount grid = 0
+totalCount grid = sum (map sum (countRockVer grid))
 
 -------------------------------------------------------------------------------------------
 
