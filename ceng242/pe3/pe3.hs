@@ -73,7 +73,9 @@ coordinatesOfPits grid = quicksort (coPit (pits grid) True)
 -------------------------------------------------------------------------------------------
 
 lowerEnergy inpRobot amount = inpRobot { energy = newEnergy } where newEnergy = (energy inpRobot) - amount
+
 increaseStorage inpRobot amount = inpRobot { storage = newStorage } where newStorage = (storage inpRobot) + amount
+
 changeLocation inpRobot amount = inpRobot { location = (newX, newY) } 
     where newX = (fst (location inpRobot) + fst amount)
           newY = (snd (location inpRobot) + snd amount)
@@ -116,8 +118,14 @@ traceMove grid robot move
     | otherwise       = robot
     
 
+temp grid robot moves = map (traceMove grid robot) moves
+
 tracePath :: Grid -> Robot -> [Move] -> [Coordinate]
-tracePath grid robot moves = []
+--tracePath grid robot moves = [ location x | x <- [ traceMove grid robot y | y <- moves ] ]
+--tracePath grid robot moves = map location (map (traceMove grid robot) moves)
+
+tracePath grid robot [] = []
+tracePath grid robot (x:rest) = [location (traceMove grid robot x)] ++ tracePath grid (traceMove grid robot x) rest
 
 ------------------------------------- PART II ----------------------------------------------
 
@@ -143,5 +151,74 @@ energiseRobots grid robots = map (increaseEnergy ((coPit (scs grid) True)!!0)) r
 
 -------------------------------------------------------------------------------------------
 
+energyConsumption move 
+    | move == PickUp  = 5
+    | move == PutDown = 3
+    | otherwise       = 1
+
+isCapable robot move = (energy robot) >= (energyConsumption move)
+
+replaceInRow list newElem 0 = newElem : (tail list)
+replaceInRow list newElem ind = (head list) : replaceInRow (tail list) newElem (ind - 1)
+
+replaceTotal grid newElem (x, 0) = (replaceInRow (head grid) newElem x) : (tail grid)
+replaceTotal grid newElem (x, y) = (head grid) : replaceTotal (tail grid) newElem (x, y-1)
+
+reduceRock (Rock a) = Rock (a-1)
+
+pickUpHelper grid robot = if (capacity robot > storage robot)
+                             then (replaceTotal grid (reduceRock ((grid!!(snd (location robot)))!!(fst(location robot)))) (fst(location robot), snd (location robot)), let newStorage = ((storage robot) + 1)
+                                                                                                                                                                           in robot { storage = newStorage })
+                             else (grid, robot)
+             
+             
+increaseSpaceCraft (SpaceCraft a) = SpaceCraft (a+1)
+                 
+putDownHelper grid robot = (replaceTotal grid (increaseSpaceCraft ((grid!!(snd (location robot)))!!(fst(location robot)))) (fst(location robot), snd (location robot)), let newStorage = ((storage robot) - 1)
+                                                                                                                                                                           in robot { storage = newStorage })
+
+moveNorth robot = if (snd (location robot) /= 0)
+                     then let newLoc = (fst (location robot), snd(location robot) - 1)
+                          in robot {location = newLoc}
+                     else robot
+
+moveWest robot = if (fst (location robot) /= 0)
+                    then let newLoc = (fst (location robot) - 1, snd(location robot))
+                         in robot {location = newLoc}
+                    else robot
+
+
+moveSouth grid robot = if (snd (location robot) < length grid)
+                          then let newLoc = (fst (location robot), snd(location robot) + 1)
+                               in robot {location = newLoc}
+                          else robot
+
+moveEast grid robot = if (fst (location robot) < length (grid!!0))
+                         then let newLoc = (fst (location robot) + 1, snd(location robot))
+                              in robot {location = newLoc}
+                         else robot
+
+moveHelper grid move robot
+    | move == North = moveNorth robot
+    | move == West  = moveWest robot
+    | move == South = moveSouth grid robot
+    | move == East  = moveEast grid robot
+
+
+reduceEnergyOfRobot (grid, robot) move = (grid, let newEnergy = (energy robot - (energyConsumption move)) 
+                                                in robot {energy = newEnergy})
+    
+applyMoveHelper :: Grid -> Robot -> Move -> (Grid, Robot)
+applyMoveHelper grid robot move
+    | (energy robot) <= 0        = (grid, robot)
+    | not (isCapable robot move) = (grid, robot {energy = 0})
+    | isPit ((grid!!(snd (location robot)))!!(fst(location robot))) = (grid, let newEnergy = (energy robot) - energyConsumption move in robot { energy = newEnergy })
+    | move == PickUp = reduceEnergyOfRobot (pickUpHelper grid robot) move
+    | move == PutDown = reduceEnergyOfRobot (putDownHelper grid robot) move
+    | otherwise = reduceEnergyOfRobot (grid, moveHelper grid move robot) move
+    
+
 applyMoves :: Grid -> Robot -> [Move] -> (Grid, Robot)
-applyMoves grid robot moves = (grid, robot)
+applyMoves grid robot [] = (grid, robot)
+applyMoves grid robot moves = let (newGrid, newRobot) = applyMoveHelper grid robot (head moves)
+                              in applyMoves newGrid newRobot (tail moves)
