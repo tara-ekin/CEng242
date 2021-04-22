@@ -41,9 +41,34 @@ totalCount :: Grid -> Int
 totalCount grid = sum (map sum (countRockVer grid))
 
 -------------------------------------------------------------------------------------------
+quicksort :: Ord a => [a] -> [a]
+quicksort []     = []
+quicksort (p:xs) = (quicksort lesser) ++ [p] ++ (quicksort greater)
+    where
+        lesser  = filter (< p) xs
+        greater = filter (>= p) xs
 
+isPit :: Cell -> Bool
+isPit Pit = True
+isPit _ = False
+
+pitsHor :: [Cell] -> [Bool]
+pitsHor inpLine = map isPit inpLine
+
+pits :: [[Cell]] -> [[Bool]]
+pits inpGrid = map pitsHor inpGrid
+
+
+findAllInRow list val = [x | x <- [0..(length list - 1)], list!!x == val]
+
+findAll [] val = []
+findAll grid val = [findAllInRow (head grid) val] ++ findAll (tail grid) val
+
+coPit grid val = [(x, y) | y <- [0..(length (findAll grid val) - 1)], x <- (findAll grid val)!!y]
+  
+  
 coordinatesOfPits :: Grid -> [Coordinate]
-coordinatesOfPits grid = []
+coordinatesOfPits grid = quicksort (coPit (pits grid) True)
 
 -------------------------------------------------------------------------------------------
 
