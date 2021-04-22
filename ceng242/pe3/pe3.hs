@@ -72,13 +72,39 @@ coordinatesOfPits grid = quicksort (coPit (pits grid) True)
 
 -------------------------------------------------------------------------------------------
 
+lowerEnergy inpRobot amount = inpRobot { energy = newEnergy } where newEnergy = (energy inpRobot) - amount
+increaseStorage inpRobot amount = inpRobot { storage = newStorage } where newStorage = (storage inpRobot) + amount
+changeLocation inpRobot amount = inpRobot { location = (newX, newY) } 
+    where newX = (fst (location inpRobot) + fst amount)
+          newY = (snd (location inpRobot) + snd amount)
+
+
+
+
 tracePath :: Grid -> Robot -> [Move] -> [Coordinate]
 tracePath grid robot moves = []
 
 ------------------------------------- PART II ----------------------------------------------
 
+cull a 
+    | a > 100 = 100
+    | a < 0 = 0
+    | otherwise = a
+
+isSC :: Cell -> Bool
+isSC (SpaceCraft _) = True
+isSC _ = False
+
+scHor inpLine = map isSC inpLine
+
+scs inpGrid = map scHor inpGrid
+
+increaseEnergy scLocation robot = robot { energy = newEnergy } where newEnergy = cull ((energy robot) + max 0 (100-((abs ((fst (location robot)) - (fst scLocation)) + abs ((snd (location robot)) - (snd scLocation))) * 20)))
+      
+
+
 energiseRobots :: Grid -> [Robot] -> [Robot]
-energiseRobots grid robots = robots
+energiseRobots grid robots = map (increaseEnergy ((coPit (scs grid) True)!!0)) robots
 
 -------------------------------------------------------------------------------------------
 
