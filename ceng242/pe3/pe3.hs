@@ -78,8 +78,43 @@ changeLocation inpRobot amount = inpRobot { location = (newX, newY) }
     where newX = (fst (location inpRobot) + fst amount)
           newY = (snd (location inpRobot) + snd amount)
 
-
-
+          --North | East | South | West | PickUp | PutDown
+          --   1     1       1      1       5         3      
+traceMove grid robot move
+    | move == North   = if not (isPit ((grid!!(snd (location robot)))!!(fst(location robot)))) && (snd (location robot) /= 0) && (energy robot) >= 1
+                           then let newEnergy = ((energy robot) - 1)
+                                    newLocation = (fst (location robot), snd (location robot) - 1)
+                                in robot { energy = newEnergy, location = newLocation }
+                           else let newEnergy = cull ((energy robot)-1)
+                                in robot { energy = newEnergy } 
+    | move == South   = if not (isPit ((grid!!(snd (location robot)))!!(fst(location robot)))) && (snd (location robot) /= (length grid - 1)) && (energy robot) >= 1
+                           then let newEnergy = ((energy robot) - 1)
+                                    newLocation = (fst (location robot), snd (location robot) + 1)
+                                in robot { energy = newEnergy, location = newLocation }
+                           else let newEnergy = cull ((energy robot)-1)
+                                in robot { energy = newEnergy } 
+    | move == East    = if not (isPit ((grid!!(snd (location robot)))!!(fst(location robot)))) && (fst (location robot) /= (length (grid!!0) - 1)) && (energy robot) >= 1
+                           then let newEnergy = ((energy robot) - 1)
+                                    newLocation = (fst (location robot) + 1, snd (location robot))
+                                in robot { energy = newEnergy, location = newLocation }
+                           else let newEnergy = cull ((energy robot)-1)
+                                in robot { energy = newEnergy } 
+    | move == West    = if not (isPit ((grid!!(snd (location robot)))!!(fst(location robot)))) && (fst (location robot) /= 0) && (energy robot) >= 1
+                           then let newEnergy = ((energy robot) - 1)
+                                    newLocation = (fst (location robot) - 1, snd (location robot))
+                                in robot { energy = newEnergy, location = newLocation }
+                           else let newEnergy = cull ((energy robot)-1)
+                                in robot { energy = newEnergy } 
+    | move == PickUp  = if (energy robot >= 5)
+                           then let newEnergy = ((energy robot) - 5)
+                                in robot { energy = newEnergy }
+                           else robot { energy = 0 }
+    | move == PutDown = if (energy robot >= 3)
+                           then let newEnergy = ((energy robot) - 3)
+                                in robot { energy = newEnergy }
+                           else robot { energy = 0 }
+    | otherwise       = robot
+    
 
 tracePath :: Grid -> Robot -> [Move] -> [Coordinate]
 tracePath grid robot moves = []
