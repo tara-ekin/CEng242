@@ -21,7 +21,7 @@ data Robot = Robot { name :: String,
 -------------------------------------- PART I ---------------------------------------------
 
 isInGrid :: Grid -> Coordinate -> Bool
-isInGrid grid coor = if (0 <= (fst coor)) && (fst coor <= (length grid)) && (0 <= (snd coor)) && ((snd coor) <= (length(grid!!0)))
+isInGrid grid coor = if (0 <= (snd coor)) && (snd coor < (length grid)) && (0 <= (fst coor)) && ((fst coor) < (length(grid!!0)))
                         then True
                         else False
 
