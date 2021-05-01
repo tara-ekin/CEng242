@@ -60,8 +60,13 @@ numContacts :: DigitTree -> Int
 numContacts inp = contactCounter inp 0
     
 -- getContacts: Generate the contacts and their phone numbers in order given a tree. 
+digitCollector :: DigitTree -> [Digit] -> [([Digit], String)]
+digitCollector (Leaf name) digitList = [(digitList, name)]
+digitCollector (Node [(Digit a, innerTree)]) digitList = digitCollector (innerTree) (digitList ++ [Digit a])
+digitCollector (Node innerTree) digitList = digitCollector (Node [(head innerTree)]) digitList ++ digitCollector (Node (tail innerTree)) digitList
+
 getContacts :: DigitTree -> [(PhoneNumber, String)]
-getContacts _ = undefined
+getContacts inp = digitCollector inp []
 
 -- autocomplete: Create an autocomplete list of contacts given a prefix
 -- e.g. autocomplete "32" areaCodes -> 
