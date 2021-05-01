@@ -26,8 +26,10 @@ type PhoneNumber = [Digit]
 
 -- toDigit: Safely convert a character to a digit
 toDigit :: Char -> Maybe Digit
-toDigit _ = undefined
-
+toDigit c = if not (elem c ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
+               then Nothing
+               else (Just (Digit c))
+                                   
 -- toDigits: Safely convert a bunch of characters to a list of digits.
 --           Particularly, an empty string should fail.
 toDigits :: String -> Maybe PhoneNumber
