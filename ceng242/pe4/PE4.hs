@@ -28,13 +28,20 @@ type PhoneNumber = [Digit]
 toDigit :: Char -> Maybe Digit
 toDigit c = if not (elem c ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
                then Nothing
-               else (Just (Digit c))
+               else Just (Digit c)
                                    
 -- toDigits: Safely convert a bunch of characters to a list of digits.
 --           Particularly, an empty string should fail.
+containsNonDigit :: String -> Bool
+containsNonDigit s = if elem False [elem x ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'] | x <- s]
+                        then True
+                        else False
+                        
 toDigits :: String -> Maybe PhoneNumber
-toDigits _ = undefined
-
+toDigits "" = Nothing
+toDigits s = if containsNonDigit s 
+                then Nothing
+                else Just [Digit x | x <- s]
 
 -----------
 -- Part II:
