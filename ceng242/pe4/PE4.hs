@@ -71,8 +71,36 @@ getContacts inp = digitCollector inp []
 -- autocomplete: Create an autocomplete list of contacts given a prefix
 -- e.g. autocomplete "32" areaCodes -> 
 --      [([Digit '2'], "Adana"), ([Digit '6'], "Hatay"), ([Digit '8'], "Osmaniye")]
+stringToDigits :: String -> [Digit]
+stringToDigits s = [Digit x | x <- s]
+                                                  
+findInnerTree :: [Digit] -> DigitTree -> [DigitTree]
+findInnerTree [] tree = [(Node [(Digit 'N', Leaf "")])]
+findInnerTree x (Node [(d, Leaf l)]) = if (length x == 1) && (head x == d)
+                                                then [Node [(d, Leaf l)]]
+                                                else [Node [(Digit 'N', Leaf "")]]
+findInnerTree x (Node [(d, innerTree)]) = if (head x == d) && (length x == 1) 
+                                             then [innerTree] 
+                                             else if (head x == d)
+                                                     then findInnerTree (tail x) (innerTree)
+                                                     else [Node [(Digit 'N', Leaf "")]]
+findInnerTree x (Node innerTree) = findInnerTree x (Node [(head innerTree)]) ++ findInnerTree x (Node (tail innerTree))
+
+notEmpty :: DigitTree -> Bool
+notEmpty (Node [(d, _)]) = d /= (Digit 'N')
+
+notEmpty2 :: [([Digit], String)] -> Bool
+notEmpty2 inp = inp /= [([Digit 'N'],"")]
+
+listNames :: [DigitTree] -> [[(PhoneNumber, String)]]
+listNames trees = (filter notEmpty2 [getContacts x | x <- trees])
+
+takeHead :: [[(PhoneNumber, String)]] -> [(PhoneNumber, String)]
+takeHead phones = if (length phones > 0) then head phones
+                                         else []
+
 autocomplete :: String -> DigitTree -> [(PhoneNumber, String)]
-autocomplete _ _ = undefined
+autocomplete s tree = takeHead (listNames (findInnerTree (stringToDigits s) tree))
 
 
 -----------
