@@ -48,8 +48,16 @@ toDigits s = if containsNonDigit s
 -- Some phonebook business.
 
 -- numContacts: Count the number of contacts in the phonebook...
+eraseDigit :: (Digit, DigitTree) -> DigitTree
+eraseDigit (Digit _, others) = others
+
+contactCounter :: DigitTree -> Int -> Int
+contactCounter (Leaf _) num = num + 1
+contactCounter (Node [(Digit _, innerTree)]) num = contactCounter (innerTree) (num)
+contactCounter (Node innerTree) num = contactCounter (eraseDigit (head innerTree)) (num) + contactCounter (Node (tail innerTree)) (num)
+    
 numContacts :: DigitTree -> Int
-numContacts _ = undefined
+numContacts inp = contactCounter inp 0
     
 -- getContacts: Generate the contacts and their phone numbers in order given a tree. 
 getContacts :: DigitTree -> [(PhoneNumber, String)]
