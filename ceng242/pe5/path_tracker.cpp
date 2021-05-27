@@ -11,6 +11,10 @@
  */
 PathTracker::PathTracker()
 {
+    final_x = 0;
+    final_y = 0;
+    displacement = 0;
+    distance = 0;
 }
 
 /**
@@ -27,6 +31,20 @@ PathTracker::PathTracker()
 */
 PathTracker::PathTracker(int *existing_path, int number_of_vectors)
 {
+    final_x = 0;
+    final_y = 0;
+    displacement = 0;
+    distance = 0;
+    
+    for(int i=0; i<number_of_vectors; i+=2){
+        int step_x = existing_path[i];
+        int step_y = existing_path[i+1];
+        
+        final_x += step_x;
+        final_y += step_y;
+        distance += sqrt(pow(step_x, 2) + pow(step_y, 2));
+        displacement = sqrt(pow(final_x, 2) + pow(final_y, 2));
+    }
 }
 
 /**
@@ -42,6 +60,15 @@ PathTracker::PathTracker(int *existing_path, int number_of_vectors)
  */
 PathTracker &PathTracker::operator+=(const int *new_vector)
 {
+    int step_x = new_vector[0];
+    int step_y = new_vector[1];
+    
+    final_x += step_x;
+    final_y += step_y;
+    calculate_distance(step_x, step_y);
+    displacement = calculate_displacement();
+    
+    return *this;
 }
 
 /**
@@ -54,7 +81,10 @@ PathTracker &PathTracker::operator+=(const int *new_vector)
  */
 bool PathTracker::operator==(const PathTracker &rhs) const
 {
-    return true;
+    if (displacement == rhs.displacement)
+        return true;
+    else
+        return false;
 }
 
 /**
@@ -67,7 +97,10 @@ bool PathTracker::operator==(const PathTracker &rhs) const
  */
 bool PathTracker::operator>(const PathTracker &rhs) const
 {
-    return true;
+    if (displacement > rhs.displacement)
+        return true;
+    else
+        return false;
 }
 
 /**
@@ -80,7 +113,10 @@ bool PathTracker::operator>(const PathTracker &rhs) const
  */
 bool PathTracker::operator<(const PathTracker &rhs) const
 {
-    return true;
+    if (displacement < rhs.displacement)
+        return true;
+    else
+        return false;
 }
 
 /**
@@ -93,7 +129,10 @@ bool PathTracker::operator<(const PathTracker &rhs) const
  */
 bool PathTracker::operator==(const float comp) const
 {
-    return true;
+    if (distance == comp)
+        return true;
+    else
+        return false;
 }
 
 /**
@@ -104,7 +143,7 @@ bool PathTracker::operator==(const float comp) const
  */
 float PathTracker::calculate_displacement()
 {
-    return 0;
+    return calculate_l2(final_x, final_y, 0, 0);
 }
 
 /**
@@ -116,6 +155,7 @@ float PathTracker::calculate_displacement()
  */
 void PathTracker::calculate_distance(int x, int y)
 {
+    distance += calculate_l2(x, y, 0, 0);
 }
 
 /**
@@ -130,7 +170,7 @@ void PathTracker::calculate_distance(int x, int y)
  */
 float PathTracker::calculate_l2(int x1, int y1, int x2, int y2)
 {
-    return 0;
+    return sqrt(pow(x1-x2, 2) + pow(y1-y2, 2));
 }
 
 /**
@@ -144,4 +184,5 @@ void PathTracker::summary()
     std::cout.precision(5);
     
     /* WRITE YOUR CODE HERE */
+    std::cout << "Final Position: [" << final_x << "," << final_y << "] Displacement: "<< displacement << " Distance: " << distance << std::endl;
 }
