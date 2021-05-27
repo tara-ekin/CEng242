@@ -36,9 +36,9 @@ PathTracker::PathTracker(int *existing_path, int number_of_vectors)
     displacement = 0;
     distance = 0;
     
-    for(int i=0; i<number_of_vectors; i+=2){
-        int step_x = existing_path[i];
-        int step_y = existing_path[i+1];
+    for(int i=0; i<number_of_vectors; i++){
+        int step_x = existing_path[2*i];
+        int step_y = existing_path[2*i+1];
         
         final_x += step_x;
         final_y += step_y;
