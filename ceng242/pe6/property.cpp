@@ -26,6 +26,7 @@ void Property::set_owner(Owner *owner)
 
 float Property::valuate()
 {
+    return 0;
 }
 
 string &Property::get_name()
