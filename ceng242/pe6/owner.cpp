@@ -56,11 +56,13 @@ void Owner::buy(Property *property, Owner *seller)
         }
         
         if(has){
-            this->properties.push_back(property);
+            this->add_property(property);
             this->balance -= value;
             
             seller->properties.erase(seller->properties.begin() + i);
             seller->balance += value;
+            
+            property->set_owner(this);
         }
         else{
             std::cout << "[ERROR] Transaction  on  unowned  property" << std::endl;
@@ -98,11 +100,13 @@ void Owner::sell(Property *property, Owner *owner)
         }
         
         if(has){
-            owner->properties.push_back(property);
+            owner->add_property(property);
             owner->balance -= value;
             
             this->properties.erase(this->properties.begin() + i);
             this->balance += value;
+            
+            property->set_owner(owner);
         }
         else{
             std::cout << "[ERROR] Transaction  on  unowned  property" << std::endl;
