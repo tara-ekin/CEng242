@@ -13,4 +13,6 @@ Apartment::Apartment(const string &property_name, int area, Owner *owner, int fl
 
 float Apartment::valuate()
 {
+    float e = having_elevator ? 1.5 : 1;
+    return e * this->area * this->floor;
 }

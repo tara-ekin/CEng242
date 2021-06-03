@@ -13,4 +13,6 @@ Villa::Villa(const string &property_name, int area, Owner *owner, int number_of_
 
 float Villa::valuate()
 {
+    float g = having_garden ? 2 : 1;
+    return 10 * g * this->area * this->number_of_floors ;
 }

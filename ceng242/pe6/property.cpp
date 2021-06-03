@@ -21,6 +21,7 @@ Property::Property(const string &property_name, int area, Owner *owner)
 
 void Property::set_owner(Owner *owner)
 {
+    this->owner = owner;
 }
 
 float Property::valuate()
