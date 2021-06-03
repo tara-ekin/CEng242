@@ -39,4 +39,10 @@ void Owner::sell(Property *property, Owner *owner)
 
 void Owner::list_properties()
 {
+    std::cout << "Properties of " << this->name << ":" << std::endl;
+    std::cout << "Balance: " << this->balance << "$" << std::endl;
+    
+    for(std::vector<Property *>::size_type i=1; i<=properties.size(); i++){
+        std::cout << i << ". " << properties[i-1]->get_name() << std::endl;
+    }
 }
