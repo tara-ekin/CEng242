@@ -1,6 +1,3 @@
-# metu_courses
-Material related to the courses that I take at METU.
-
 ## CEng242
 #### Programming Exams 
 - **1-4:** Haskell
